@@ -1,0 +1,30 @@
+import openai
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+
+# Ingiza API keys zako
+TELEGRAM_API_TOKEN = '7278180788:AAF3-vP-ANpKVswTmfyysUudyNq4e6bbUic'
+OPENAI_API_KEY = 'sk-proj-idDiXCVlzwCn8cy6wCpIT3BlbkFJvylQNkETLjdPyhMDz8wc'
+
+openai.api_key = OPENAI_API_KEY
+
+# Fungua Telegram bot
+updater = Updater(token=TELEGRAM_API_TOKEN, use_context=True)
+dispatcher = updater.dispatcher
+
+# Fanya kazi ya kujibu ujumbe
+def handle_message(update, context):
+    user_message = update.message.text
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=user_message,
+        max_tokens=150
+    )
+    bot_response = response.choices[0].text.strip()
+    context.bot.send_message(chat_id=update.effective_chat.id, text=bot_response)
+
+# Unda vitendo vya bot
+message_handler = MessageHandler(Filters.text & (~Filters.command), handle_message)
+dispatcher.add_handler(message_handler)
+
+# Anzisha bot
+updater.start_polling()
